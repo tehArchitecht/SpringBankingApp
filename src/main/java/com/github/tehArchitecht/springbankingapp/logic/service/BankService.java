@@ -9,7 +9,8 @@ import com.github.tehArchitecht.springbankingapp.logic.Result;
 import com.github.tehArchitecht.springbankingapp.logic.Status;
 import com.github.tehArchitecht.springbankingapp.logic.dto.*;
 
-import com.github.tehArchitecht.springbankingapp.logic.security.UserDetailsImpl;
+import com.github.tehArchitecht.springbankingapp.security.UserDetailsImpl;
+import com.github.tehArchitecht.springbankingapp.security.service.UserDetailsServiceImpl;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

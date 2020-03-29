@@ -1,4 +1,4 @@
-package com.github.tehArchitecht.springbankingapp.logic.security;
+package com.github.tehArchitecht.springbankingapp.security;
 
 import com.github.tehArchitecht.springbankingapp.data.model.User;
 import org.springframework.security.core.GrantedAuthority;

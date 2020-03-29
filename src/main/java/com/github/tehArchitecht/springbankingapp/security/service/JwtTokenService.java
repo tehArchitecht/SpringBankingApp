@@ -1,4 +1,4 @@
-package com.github.tehArchitecht.springbankingapp.logic.security;
+package com.github.tehArchitecht.springbankingapp.security.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtUtil {
+public class JwtTokenService {
     private static final long JWT_TOKEN_VALIDITY_MS = 5*60*60*1000;
 
     @Value("${jwt.secret}")

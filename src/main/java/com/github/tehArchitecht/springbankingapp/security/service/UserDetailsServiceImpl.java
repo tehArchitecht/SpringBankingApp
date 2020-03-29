@@ -1,8 +1,8 @@
-package com.github.tehArchitecht.springbankingapp.logic.service;
+package com.github.tehArchitecht.springbankingapp.security.service;
 
 import com.github.tehArchitecht.springbankingapp.data.model.User;
 import com.github.tehArchitecht.springbankingapp.data.repository.UserRepository;
-import com.github.tehArchitecht.springbankingapp.logic.security.UserDetailsImpl;
+import com.github.tehArchitecht.springbankingapp.security.UserDetailsImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

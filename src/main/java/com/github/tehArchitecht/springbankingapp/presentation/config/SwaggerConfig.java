@@ -1,4 +1,4 @@
-package com.github.tehArchitecht.springbankingapp.logic.config;
+package com.github.tehArchitecht.springbankingapp.presentation.config;
 
 import com.google.common.collect.Lists;
 import org.springframework.context.annotation.Bean;

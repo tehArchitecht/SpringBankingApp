@@ -5,9 +5,9 @@ import com.github.tehArchitecht.springbankingapp.logic.Result;
 import com.github.tehArchitecht.springbankingapp.logic.Status;
 import com.github.tehArchitecht.springbankingapp.logic.dto.AccountDto;
 import com.github.tehArchitecht.springbankingapp.logic.dto.OperationDto;
-import com.github.tehArchitecht.springbankingapp.logic.security.JwtUtil;
+import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenService;
 import com.github.tehArchitecht.springbankingapp.logic.service.BankService;
-import com.github.tehArchitecht.springbankingapp.logic.service.UserDetailsServiceImpl;
+import com.github.tehArchitecht.springbankingapp.security.service.UserDetailsServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,13 +22,13 @@ public class BankController {
     private BankService bankService;
     private AuthenticationManager authenticationManager;
     private UserDetailsService userDetailsService;
-    private JwtUtil jwtUtil;
+    private JwtTokenService jwtTokenService;
 
-    public BankController(BankService bankService, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService, JwtUtil jwtUtil) {
+    public BankController(BankService bankService, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService, JwtTokenService jwtTokenService) {
         this.bankService = bankService;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
+        this.jwtTokenService = jwtTokenService;
     }
 
     // -------------------------------------------------------------------------------------------------------------- //
@@ -46,7 +46,7 @@ public class BankController {
         Result<UserDetails> result = bankService.signInWithName(userName, password);
         if (result.failure()) return "";
 
-        String token = jwtUtil.generateToken(result.getData());
+        String token = jwtTokenService.generateToken(result.getData());
         return "Bearer " + token;
     }
 

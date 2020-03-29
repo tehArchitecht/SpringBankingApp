@@ -1,7 +1,7 @@
-package com.github.tehArchitecht.springbankingapp.logic.config;
+package com.github.tehArchitecht.springbankingapp.security.config;
 
-import com.github.tehArchitecht.springbankingapp.logic.security.JwtRequestFilter;
-import com.github.tehArchitecht.springbankingapp.logic.service.UserDetailsServiceImpl;
+import com.github.tehArchitecht.springbankingapp.security.JwtRequestFilter;
+import com.github.tehArchitecht.springbankingapp.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
