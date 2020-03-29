@@ -134,6 +134,19 @@ public class BankService {
         }
     }
 
+    public Status setPrimaryAccount(UUID accountId) {
+        try {
+            if (isTokenInvalid())
+                return Status.BAD_TOKEN;
+            Long userId = getUserId();
+
+            userService.setPrimaryAccountId(userId, accountId);
+            return Status.SET_PRIMARY_ACCOUNT_SUCCESS;
+        } catch (DataAccessException e) {
+            return Status.FAILURE_INTERNAL_ERROR;
+        }
+    }
+
     // -------------------------------------------------------------------------------------------------------------- //
     // Operations with funds                                                                                          //
     // -------------------------------------------------------------------------------------------------------------- //

@@ -7,14 +7,14 @@ import javax.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 public class Account {
     @Id
     @GeneratedValue
     private UUID id;
-    @GeneratedValue
-    private Long number;
     private BigDecimal balance;
     private Currency currency;
 

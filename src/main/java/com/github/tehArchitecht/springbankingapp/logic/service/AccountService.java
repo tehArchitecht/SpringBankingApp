@@ -1,11 +1,12 @@
 package com.github.tehArchitecht.springbankingapp.logic.service;
 
 import com.github.tehArchitecht.springbankingapp.data.model.Account;
+import com.github.tehArchitecht.springbankingapp.data.model.User;
 import com.github.tehArchitecht.springbankingapp.data.repository.AccountRepository;
+import com.github.tehArchitecht.springbankingapp.data.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,13 +14,20 @@ import java.util.UUID;
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
 
-    AccountService(AccountRepository accountRepository) {
+    AccountService(AccountRepository accountRepository, UserRepository userRepository) {
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
     }
 
     void add(Account account) {
-        accountRepository.save(account);
+        Account saved = accountRepository.save(account);
+
+        User user = account.getUser();
+        if (user.getPrimaryAccount() == null) {
+            userRepository.setPrimaryAccountIdById(user.getId(), saved.getId());
+        }
     }
 
     Optional<Account> get(UUID accountId) {
@@ -39,7 +47,9 @@ public class AccountService {
     }
 
     Optional<Account> getUserPrimaryAccount(Long userId) {
-        List<Account> accounts = accountRepository.findAllByUserId(userId);
-        return accounts.stream().min(Comparator.comparing(Account::getNumber));
+        Optional<User> optional = userRepository.findById(userId);
+        return optional.isPresent()
+                ? Optional.of(optional.get().getPrimaryAccount())
+                : Optional.empty();
     }
 }

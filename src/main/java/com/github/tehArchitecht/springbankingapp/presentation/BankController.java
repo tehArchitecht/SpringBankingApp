@@ -73,6 +73,11 @@ public class BankController {
         return bankService.createAccount(currency);
     }
 
+    @PostMapping("/set-primary-account")
+    public Status createAccount(@RequestParam UUID accountId) {
+        return bankService.setPrimaryAccount(accountId);
+    }
+
     // -------------------------------------------------------------------------------------------------------------- //
     // Operations with funds                                                                                          //
     // -------------------------------------------------------------------------------------------------------------- //

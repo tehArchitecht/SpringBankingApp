@@ -5,6 +5,7 @@ import com.github.tehArchitecht.springbankingapp.data.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -32,5 +33,9 @@ public class UserService {
 
     Optional<User> getByPhoneNumber(String phoneNumber) {
         return userRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    void setPrimaryAccountId(Long userId, UUID primaryAccountId) {
+        userRepository.setPrimaryAccountIdById(userId, primaryAccountId);
     }
 }

@@ -4,7 +4,9 @@ import javax.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 public class User {
     @Id
@@ -16,6 +18,10 @@ public class User {
     private String address;
     @Column(unique=true)
     private String phoneNumber;
+
+    @OneToOne
+    @JoinColumn(name = "primary_account_id")
+    private Account primaryAccount;
 
     public User(String name, String password, String address, String phoneNumber) {
         this.name = name;

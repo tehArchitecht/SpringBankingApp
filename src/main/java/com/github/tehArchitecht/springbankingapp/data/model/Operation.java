@@ -2,13 +2,14 @@ package com.github.tehArchitecht.springbankingapp.data.model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import javax.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 public class Operation {
     @Id
@@ -23,8 +24,10 @@ public class Operation {
     private BigDecimal receiverResultingBalance;
 
     @ManyToOne
+    @JoinColumn(name = "sender_account_id")
     private Account senderAccount;
     @ManyToOne
+    @JoinColumn(name = "receiver_account_id")
     private Account receiverAccount;
 
     public Operation(Timestamp date, Currency currency, Account senderAccount, Account receiverAccount,
