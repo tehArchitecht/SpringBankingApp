@@ -7,8 +7,10 @@ import com.github.tehArchitecht.springbankingapp.data.model.User;
 import com.github.tehArchitecht.springbankingapp.logic.CurrencyConverter;
 import com.github.tehArchitecht.springbankingapp.logic.Result;
 import com.github.tehArchitecht.springbankingapp.logic.Status;
-import com.github.tehArchitecht.springbankingapp.logic.dto.*;
 
+import com.github.tehArchitecht.springbankingapp.logic.dto.request.*;
+import com.github.tehArchitecht.springbankingapp.logic.dto.response.AccountDto;
+import com.github.tehArchitecht.springbankingapp.logic.dto.response.OperationDto;
 import com.github.tehArchitecht.springbankingapp.security.UserDetailsImpl;
 import com.github.tehArchitecht.springbankingapp.security.service.UserDetailsServiceImpl;
 import org.springframework.dao.DataAccessException;
@@ -32,12 +34,12 @@ import java.util.stream.Stream;
 
 @Service
 public class BankService {
-    private AccountService accountService;
-    private OperationService operationService;
-    private UserService userService;
+    private final AccountService accountService;
+    private final OperationService operationService;
+    private final UserService userService;
 
-    private AuthenticationManager authenticationManager;
-    private UserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     public BankService(AccountService accountService, OperationService operationService,
                        UserService userService, AuthenticationManager authenticationManager,
@@ -53,19 +55,25 @@ public class BankService {
     // Registration and authorisation operations                                                                      //
     // -------------------------------------------------------------------------------------------------------------- //
 
-    public Status signUp (String name, String password, String address, String phoneNumber) {
+    public Status signUp (SignUpRequest request) {
+        String userName = request.getUserName();
+        String phoneNumber = request.getPhoneNumber();
+
         try {
-            if (userService.isNameInUse(name) || userService.isPhoneNumberInUse(phoneNumber))
+            if (userService.isNameInUse(userName) || userService.isPhoneNumberInUse(phoneNumber))
                 return Status.SING_UP_FAILURE_NAME_OR_PHONE_NUMBER_TAKEN;
 
-            userService.add(new User(name, password, address, phoneNumber));
+            userService.add(extractUser(request));
             return Status.SIGN_UP_SUCCESS;
         } catch (DataAccessException e) {
             return Status.FAILURE_INTERNAL_ERROR;
         }
     }
 
-    public Result<UserDetails> signInWithName(String userName, String password) {
+    public Result<UserDetails> signInWithName(SignInWithNameRequest request) {
+        String userName = request.getUserName();
+        String password = request.getPassword();
+
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
             return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, userDetailsService.loadUserByUsername(userName));
@@ -122,7 +130,9 @@ public class BankService {
     // Account related operations                                                                                     //
     // -------------------------------------------------------------------------------------------------------------- //
 
-    public Status createAccount(Currency currency) {
+    public Status createAccount(CreateAccountRequest request) {
+        Currency currency = request.getCurrency();
+
         try {
             if (isTokenInvalid())
                 return Status.BAD_TOKEN;
@@ -135,7 +145,9 @@ public class BankService {
         }
     }
 
-    public Status setPrimaryAccount(UUID accountId) {
+    public Status setPrimaryAccount(SetPrimaryAccountRequest request) {
+        UUID accountId = request.getAccountId();
+
         try {
             if (isTokenInvalid())
                 return Status.BAD_TOKEN;
@@ -152,7 +164,11 @@ public class BankService {
     // Operations with funds                                                                                          //
     // -------------------------------------------------------------------------------------------------------------- //
 
-    public Status depositFunds(UUID accountId, Currency currency, BigDecimal amount) {
+    public Status depositFunds(DepositFundsRequest request) {
+        UUID accountId = request.getAccountId();
+        BigDecimal amount = request.getAmount();
+        Currency currency = request.getCurrency();
+
         try {
             Result<Account> result = getAccountEntity(accountId);
             if (result.failure())
@@ -169,8 +185,12 @@ public class BankService {
         }
     }
 
-    public Status transferFunds(UUID senderAccountId, String receiverPhoneNumber,
-                                BigDecimal amount, Currency currency) {
+    public Status transferFunds(TransferFundsRequest request) {
+        UUID senderAccountId = request.getSenderAccountId();
+        String receiverPhoneNumber = request.getReceiverPhoneNumber();
+        BigDecimal amount = request.getAmount();
+        Currency currency = request.getCurrency();
+
         try {
             Result<Account> result = getAccountEntity(senderAccountId);
             if (result.failure())
@@ -286,6 +306,15 @@ public class BankService {
         } catch (DataAccessException e) {
             return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
         }
+    }
+
+    private User extractUser(SignUpRequest request) {
+        return new User(
+                request.getUserName(),
+                request.getPassword(),
+                request.getAddress(),
+                request.getPhoneNumber()
+        );
     }
 
     private AccountDto convertAccount(Account account) {

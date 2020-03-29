@@ -1,33 +1,24 @@
 package com.github.tehArchitecht.springbankingapp.presentation;
 
-import com.github.tehArchitecht.springbankingapp.data.model.Currency;
 import com.github.tehArchitecht.springbankingapp.logic.Result;
 import com.github.tehArchitecht.springbankingapp.logic.Status;
-import com.github.tehArchitecht.springbankingapp.logic.dto.AccountDto;
-import com.github.tehArchitecht.springbankingapp.logic.dto.OperationDto;
+import com.github.tehArchitecht.springbankingapp.logic.dto.request.*;
+import com.github.tehArchitecht.springbankingapp.logic.dto.response.AccountDto;
+import com.github.tehArchitecht.springbankingapp.logic.dto.response.OperationDto;
 import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenService;
 import com.github.tehArchitecht.springbankingapp.logic.service.BankService;
-import com.github.tehArchitecht.springbankingapp.security.service.UserDetailsServiceImpl;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 public class BankController {
-    private BankService bankService;
-    private AuthenticationManager authenticationManager;
-    private UserDetailsService userDetailsService;
-    private JwtTokenService jwtTokenService;
+    private final BankService bankService;
+    private final JwtTokenService jwtTokenService;
 
-    public BankController(BankService bankService, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService, JwtTokenService jwtTokenService) {
+    public BankController(BankService bankService, JwtTokenService jwtTokenService) {
         this.bankService = bankService;
-        this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
         this.jwtTokenService = jwtTokenService;
     }
 
@@ -36,14 +27,13 @@ public class BankController {
     // -------------------------------------------------------------------------------------------------------------- //
 
     @PostMapping("/signup")
-    public Status signUp (@RequestParam String name, @RequestParam String password,
-                          @RequestParam String address, @RequestParam String phoneNumber) {
-        return bankService.signUp(name, password, address, phoneNumber);
+    public Status signUp(@RequestBody SignUpRequest request) {
+        return bankService.signUp(request);
     }
 
     @PostMapping("/signin-with-name")
-    public String signInWithName(@RequestParam String userName, @RequestParam String password) {
-        Result<UserDetails> result = bankService.signInWithName(userName, password);
+    public String signInWithName(@RequestBody SignInWithNameRequest request) {
+        Result<UserDetails> result = bankService.signInWithName(request);
         if (result.failure()) return "";
 
         String token = jwtTokenService.generateToken(result.getData());
@@ -69,13 +59,13 @@ public class BankController {
     // -------------------------------------------------------------------------------------------------------------- //
 
     @PostMapping("/create-account")
-    public Status createAccount(@RequestParam Currency currency) {
-        return bankService.createAccount(currency);
+    public Status createAccount(@RequestBody CreateAccountRequest request) {
+        return bankService.createAccount(request);
     }
 
     @PostMapping("/set-primary-account")
-    public Status createAccount(@RequestParam UUID accountId) {
-        return bankService.setPrimaryAccount(accountId);
+    public Status setPrimaryAccount(@RequestBody SetPrimaryAccountRequest request) {
+        return bankService.setPrimaryAccount(request);
     }
 
     // -------------------------------------------------------------------------------------------------------------- //
@@ -83,14 +73,13 @@ public class BankController {
     // -------------------------------------------------------------------------------------------------------------- //
 
     @PostMapping("/deposit-funds")
-    public Status depositFunds(@RequestParam UUID accountId, @RequestParam Currency currency, @RequestParam BigDecimal amount) {
-        return bankService.depositFunds(accountId, currency, amount);
+    public Status depositFunds(@RequestBody DepositFundsRequest request) {
+        return bankService.depositFunds(request);
     }
 
     @PostMapping("/transfer-funds")
-    public Status transferFunds(@RequestParam UUID senderAccountId, @RequestParam String receiverPhoneNumber,
-                                @RequestParam BigDecimal amount, @RequestParam Currency currency) {
-        return bankService.transferFunds(senderAccountId, receiverPhoneNumber, amount, currency);
+    public Status transferFunds(@RequestBody TransferFundsRequest request) {
+        return bankService.transferFunds(request);
     }
 
 

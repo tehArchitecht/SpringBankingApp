@@ -1,4 +1,4 @@
-package com.github.tehArchitecht.springbankingapp.logic.dto;
+package com.github.tehArchitecht.springbankingapp.logic.dto.response;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
