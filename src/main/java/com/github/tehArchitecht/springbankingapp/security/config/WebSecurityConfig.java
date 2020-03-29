@@ -1,5 +1,6 @@
 package com.github.tehArchitecht.springbankingapp.security.config;
 
+import com.github.tehArchitecht.springbankingapp.security.JwtAuthenticationEntryPoint;
 import com.github.tehArchitecht.springbankingapp.security.JwtRequestFilter;
 import com.github.tehArchitecht.springbankingapp.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
     UserDetailsServiceImpl userDetailsService;
-    @Autowired
     JwtRequestFilter jwtRequestFilter;
+    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    WebSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtRequestFilter jwtRequestFilter,
+                      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+        this.userDetailsService = userDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -49,6 +56,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/configuration/ui", "/webjars/**", "/swagger-ui.html", "/swagger-resources", "/configuration/security", "/v2/api-docs").permitAll()
                 .anyRequest()
                 .authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
