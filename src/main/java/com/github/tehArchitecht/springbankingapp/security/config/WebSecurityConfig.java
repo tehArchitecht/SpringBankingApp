@@ -51,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-                .antMatchers("/signup", "/signin-with-name")
+                .antMatchers("/signup", "/signin-with-name", "/signin-with-phone-number")
                 .permitAll()
                 .antMatchers("/configuration/ui", "/webjars/**", "/swagger-ui.html", "/swagger-resources", "/configuration/security", "/v2/api-docs").permitAll()
                 .anyRequest()

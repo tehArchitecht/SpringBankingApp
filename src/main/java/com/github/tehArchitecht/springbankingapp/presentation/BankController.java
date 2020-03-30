@@ -40,6 +40,15 @@ public class BankController {
         return "Bearer " + token;
     }
 
+    @PostMapping("/signin-with-phone-number")
+    public String signInWithName(@RequestBody SignInWithPhoneNumberRequest request) {
+        Result<UserDetails> result = bankService.signWithPhoneNumber(request);
+        if (result.failure()) return "";
+
+        String token = jwtTokenService.generateToken(result.getData());
+        return "Bearer " + token;
+    }
+
     // -------------------------------------------------------------------------------------------------------------- //
     // User related operations                                                                                        //
     // -------------------------------------------------------------------------------------------------------------- //

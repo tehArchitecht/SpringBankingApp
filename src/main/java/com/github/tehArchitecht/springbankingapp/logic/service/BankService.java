@@ -75,10 +75,33 @@ public class BankService {
         String password = request.getPassword();
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, password));
-            return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, userDetailsService.loadUserByUsername(userName));
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
+            UserDetailsImpl details = (UserDetailsImpl) authenticationManager.authenticate(token).getPrincipal();
+            return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, details);
         } catch (DisabledException | BadCredentialsException e) {
             return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
+        }
+    }
+
+    public Result<UserDetails> signWithPhoneNumber(SignInWithPhoneNumberRequest request) {
+        String phoneNumber = request.getPhoneNumber();
+        String password = request.getPassword();
+
+        try {
+            Optional<User> optional = userService.getByPhoneNumber(phoneNumber);
+            if (!optional.isPresent())
+                return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
+
+            User user = optional.get();
+            String userName = user.getName();
+
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
+            UserDetailsImpl details = (UserDetailsImpl) authenticationManager.authenticate(token).getPrincipal();
+            return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, details);
+        } catch (DisabledException | BadCredentialsException e) {
+            return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
+        } catch (DataAccessException e) {
+            return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
         }
     }
 
