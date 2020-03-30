@@ -91,16 +91,16 @@ public class BankService {
         try {
             Optional<User> optional = userService.getByPhoneNumber(phoneNumber);
             if (!optional.isPresent())
-                return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
+                return Result.ofFailure(Status.SIGN_IN_WITH_PHONE_NUMBER_FAILURE_WRONG_DATA);
 
             User user = optional.get();
             String userName = user.getName();
 
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
             CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
-            return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, details);
+            return Result.ofSuccess(Status.SIGN_IN_WITH_PHONE_NUMBER_SUCCESS, details);
         } catch (DisabledException | BadCredentialsException e) {
-            return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
+            return Result.ofFailure(Status.SIGN_IN_WITH_PHONE_NUMBER_FAILURE_WRONG_DATA);
         } catch (DataAccessException e) {
             return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
         }
