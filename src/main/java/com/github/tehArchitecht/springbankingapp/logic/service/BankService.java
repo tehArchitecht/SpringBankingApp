@@ -12,7 +12,6 @@ import com.github.tehArchitecht.springbankingapp.logic.dto.request.*;
 import com.github.tehArchitecht.springbankingapp.logic.dto.response.AccountDto;
 import com.github.tehArchitecht.springbankingapp.logic.dto.response.OperationDto;
 import com.github.tehArchitecht.springbankingapp.security.UserDetailsImpl;
-import com.github.tehArchitecht.springbankingapp.security.service.UserDetailsServiceImpl;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,7 +19,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -39,16 +38,16 @@ public class BankService {
     private final UserService userService;
 
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     public BankService(AccountService accountService, OperationService operationService,
                        UserService userService, AuthenticationManager authenticationManager,
-                       UserDetailsServiceImpl userDetailsService) {
+                       PasswordEncoder passwordEncoder) {
         this.accountService = accountService;
         this.operationService = operationService;
         this.userService = userService;
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // -------------------------------------------------------------------------------------------------------------- //
@@ -63,7 +62,9 @@ public class BankService {
             if (userService.isNameInUse(userName) || userService.isPhoneNumberInUse(phoneNumber))
                 return Status.SING_UP_FAILURE_NAME_OR_PHONE_NUMBER_TAKEN;
 
-            userService.add(extractUser(request));
+            User user = extractUser(request);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userService.add(user);
             return Status.SIGN_UP_SUCCESS;
         } catch (DataAccessException e) {
             return Status.FAILURE_INTERNAL_ERROR;
