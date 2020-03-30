@@ -11,7 +11,7 @@ import com.github.tehArchitecht.springbankingapp.logic.Status;
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.*;
 import com.github.tehArchitecht.springbankingapp.logic.dto.response.AccountDto;
 import com.github.tehArchitecht.springbankingapp.logic.dto.response.OperationDto;
-import com.github.tehArchitecht.springbankingapp.security.UserDetailsImpl;
+import com.github.tehArchitecht.springbankingapp.security.CustomUserDetails;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -77,7 +77,7 @@ public class BankService {
 
         try {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-            UserDetailsImpl details = (UserDetailsImpl) authenticationManager.authenticate(token).getPrincipal();
+            CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
             return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, details);
         } catch (DisabledException | BadCredentialsException e) {
             return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
@@ -97,7 +97,7 @@ public class BankService {
             String userName = user.getName();
 
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-            UserDetailsImpl details = (UserDetailsImpl) authenticationManager.authenticate(token).getPrincipal();
+            CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
             return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, details);
         } catch (DisabledException | BadCredentialsException e) {
             return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
@@ -305,7 +305,7 @@ public class BankService {
     }
 
     private User getUser() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
