@@ -11,52 +11,46 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-import java.util.List;
 
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
     @Bean
-    public Docket newsApi() {
+    public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
+                // use all methods on all controllers in the presentation layer (excludes basic-error-controller)
+                .apis(RequestHandlerSelectors.basePackage("com.github.tehArchitecht.springbankingapp.presentation"))
                 .paths(PathSelectors.any())
                 .build()
+                // use an apiKey scheme for authentication
                 .securitySchemes(Lists.newArrayList(apiKey()))
                 .securityContexts(Lists.newArrayList(securityContext()))
+                // add additional meta information
                 .apiInfo(apiInfo());
     }
 
-    @Bean
-    SecurityContext securityContext() {
+    private SecurityContext securityContext() {
         return SecurityContext.builder()
-                .securityReferences(defaultAuth())
+                // use the jwt token (apiKey scheme) for all paths
+                .securityReferences(Lists.newArrayList(defaultAuth()))
                 .forPaths(PathSelectors.any())
                 .build();
     }
 
-    List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope
-                = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        return Lists.newArrayList(
-                new SecurityReference("Bearer", authorizationScopes));
+    private SecurityReference defaultAuth() {
+        AuthorizationScope[] scopes = { new AuthorizationScope("global", "accessEverything") };
+        return new SecurityReference("Bearer", scopes);
     }
 
     private ApiKey apiKey() {
         return new ApiKey("Bearer", "Authorization", "header");
     }
 
-    ApiInfo apiInfo() {
+    private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Bank")
-                .description("Mobile bank application")
-                .license("Apache 2.0")
-                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-                .termsOfServiceUrl("http://swagger.io/terms/")
-                .version("1.0.0").contact(new Contact("","", "some@gmail.com"))
+                .title("SpringBankingApp")
+                .description("A toy banking application powered by Spring Framework")
                 .build();
     }
 }
