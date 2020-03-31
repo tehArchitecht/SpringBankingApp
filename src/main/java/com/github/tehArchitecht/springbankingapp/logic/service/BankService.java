@@ -12,13 +12,13 @@ import com.github.tehArchitecht.springbankingapp.logic.dto.request.*;
 import com.github.tehArchitecht.springbankingapp.logic.dto.response.AccountDto;
 import com.github.tehArchitecht.springbankingapp.logic.dto.response.OperationDto;
 import com.github.tehArchitecht.springbankingapp.security.CustomUserDetails;
+import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,16 +38,18 @@ public class BankService {
     private final UserService userService;
 
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenService jwtTokenService;
     private final PasswordEncoder passwordEncoder;
 
     public BankService(AccountService accountService, OperationService operationService,
                        UserService userService, AuthenticationManager authenticationManager,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService) {
         this.accountService = accountService;
         this.operationService = operationService;
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenService = jwtTokenService;
     }
 
     // -------------------------------------------------------------------------------------------------------------- //
@@ -71,20 +73,18 @@ public class BankService {
         }
     }
 
-    public Result<UserDetails> signInWithName(SignInWithNameRequest request) {
+    public Result<String> signInWithName(SignInWithNameRequest request) {
         String userName = request.getUserName();
         String password = request.getPassword();
 
         try {
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-            CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
-            return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, details);
+            return Result.ofSuccess(Status.SIGN_IN_WITH_NAME_SUCCESS, generateToken(userName, password));
         } catch (DisabledException | BadCredentialsException e) {
             return Result.ofFailure(Status.SIGN_IN_WITH_NAME_FAILURE_WRONG_DATA);
         }
     }
 
-    public Result<UserDetails> signWithPhoneNumber(SignInWithPhoneNumberRequest request) {
+    public Result<String> signWithPhoneNumber(SignInWithPhoneNumberRequest request) {
         String phoneNumber = request.getPhoneNumber();
         String password = request.getPassword();
 
@@ -93,12 +93,8 @@ public class BankService {
             if (!optional.isPresent())
                 return Result.ofFailure(Status.SIGN_IN_WITH_PHONE_NUMBER_FAILURE_WRONG_DATA);
 
-            User user = optional.get();
-            String userName = user.getName();
-
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-            CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
-            return Result.ofSuccess(Status.SIGN_IN_WITH_PHONE_NUMBER_SUCCESS, details);
+            String userName = optional.get().getName();
+            return Result.ofSuccess(Status.SIGN_IN_WITH_PHONE_NUMBER_SUCCESS, generateToken(userName, password));
         } catch (DisabledException | BadCredentialsException e) {
             return Result.ofFailure(Status.SIGN_IN_WITH_PHONE_NUMBER_FAILURE_WRONG_DATA);
         } catch (DataAccessException e) {
@@ -154,18 +150,18 @@ public class BankService {
     // Account related operations                                                                                     //
     // -------------------------------------------------------------------------------------------------------------- //
 
-    public Status createAccount(CreateAccountRequest request) {
+    public Result<AccountDto> createAccount(CreateAccountRequest request) {
         Currency currency = request.getCurrency();
 
         try {
             if (isTokenInvalid())
-                return Status.BAD_TOKEN;
+                return Result.ofFailure(Status.BAD_TOKEN);
             User user = getUser();
 
-            accountService.add(new Account(user, currency));
-            return Status.CREATE_ACCOUNT_SUCCESS;
+            AccountDto account = convertAccount(accountService.add(new Account(user, currency)));
+            return Result.ofSuccess(Status.CREATE_ACCOUNT_SUCCESS, account);
         } catch (DataAccessException e) {
-            return Status.FAILURE_INTERNAL_ERROR;
+            return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
         }
     }
 
@@ -373,5 +369,11 @@ public class BankService {
                     operation.getReceiverResultingBalance()
             );
         }
+    }
+
+    private String generateToken(String userName, String password) {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
+        CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
+        return "Bearer " + jwtTokenService.generateToken(details);
     }
 }

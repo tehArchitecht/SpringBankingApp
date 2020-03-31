@@ -21,13 +21,14 @@ public class AccountService {
         this.userRepository = userRepository;
     }
 
-    void add(Account account) {
+    Account add(Account account) {
         Account saved = accountRepository.save(account);
 
         User user = account.getUser();
-        if (user.getPrimaryAccount() == null) {
+        if (user.getPrimaryAccount() == null)
             userRepository.setPrimaryAccountIdById(user.getId(), saved.getId());
-        }
+
+        return saved;
     }
 
     Optional<Account> get(UUID accountId) {
