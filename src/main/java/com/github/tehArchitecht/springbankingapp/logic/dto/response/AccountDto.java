@@ -15,6 +15,7 @@ public class AccountDto {
     private UUID id;
     private BigDecimal balance;
     private Currency currency;
+    private boolean isPrimary;
 }
 
 

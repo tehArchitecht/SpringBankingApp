@@ -110,10 +110,16 @@ public class BankService {
         try {
             if (isTokenInvalid())
                 return Result.ofFailure(Status.BAD_TOKEN);
-            Long userId = getUserId();
+            User user = getUser();
+            Long userId = user.getId();
+
+            Account primaryAccount = user.getPrimaryAccount();
+            UUID primaryAccountId = primaryAccount == null ? null : primaryAccount.getId();
 
             List<Account> accounts = accountService.getUserAccounts(userId);
-            List<AccountDto> accountDtos = accounts.stream().map(this::convertAccount).collect(Collectors.toList());
+            List<AccountDto> accountDtos = accounts.stream()
+                    .map((Account account) -> convertAccount(account, primaryAccountId))
+                    .collect(Collectors.toList());
             return Result.ofSuccess(Status.GET_USER_ACCOUNTS_SUCCESS, accountDtos);
         } catch (DataAccessException e) {
             return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
@@ -158,7 +164,11 @@ public class BankService {
                 return Result.ofFailure(Status.BAD_TOKEN);
             User user = getUser();
 
-            AccountDto account = convertAccount(accountService.add(new Account(user, currency)));
+            Account created = accountService.add(new Account(user, currency));
+            UUID primaryAccountId = accountService.getUserPrimaryAccount(user.getId())
+                    .map(Account::getId).orElse(null);
+
+            AccountDto account = convertAccount(created, primaryAccountId);
             return Result.ofSuccess(Status.CREATE_ACCOUNT_SUCCESS, account);
         } catch (DataAccessException e) {
             return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
@@ -337,11 +347,12 @@ public class BankService {
         );
     }
 
-    private AccountDto convertAccount(Account account) {
+    private AccountDto convertAccount(Account account, UUID primaryAccountId) {
         return new AccountDto(
                 account.getId(),
                 account.getBalance(),
-                account.getCurrency()
+                account.getCurrency(),
+                account.getId().equals(primaryAccountId)
         );
     }
 
