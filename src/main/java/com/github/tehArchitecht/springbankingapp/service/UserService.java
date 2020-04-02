@@ -1,4 +1,4 @@
-package com.github.tehArchitecht.springbankingapp.logic.service;
+package com.github.tehArchitecht.springbankingapp.service;
 
 import com.github.tehArchitecht.springbankingapp.data.model.User;
 import com.github.tehArchitecht.springbankingapp.data.repository.UserRepository;
@@ -11,31 +11,27 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
 
-    UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    void add(User user) {
+    public void add(User user) {
         userRepository.save(user);
     }
 
-    boolean isNameInUse(String name) {
+    public boolean isNameInUse(String name) {
         return userRepository.existsByName(name);
     }
 
-    boolean isPhoneNumberInUse(String phoneNumber) {
+    public boolean isPhoneNumberInUse(String phoneNumber) {
         return userRepository.existsByPhoneNumber(phoneNumber);
     }
 
-    Optional<User> getByName(String name) {
-        return userRepository.findByName(name);
-    }
-
-    Optional<User> getByPhoneNumber(String phoneNumber) {
+    public Optional<User> getByPhoneNumber(String phoneNumber) {
         return userRepository.findByPhoneNumber(phoneNumber);
     }
 
-    void setPrimaryAccountId(Long userId, UUID primaryAccountId) {
+    public void setPrimaryAccountId(Long userId, UUID primaryAccountId) {
         userRepository.setPrimaryAccountIdById(userId, primaryAccountId);
     }
 }

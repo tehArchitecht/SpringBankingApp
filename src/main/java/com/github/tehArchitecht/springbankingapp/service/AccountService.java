@@ -1,4 +1,4 @@
-package com.github.tehArchitecht.springbankingapp.logic.service;
+package com.github.tehArchitecht.springbankingapp.service;
 
 import com.github.tehArchitecht.springbankingapp.data.model.Account;
 import com.github.tehArchitecht.springbankingapp.data.model.User;
@@ -16,12 +16,12 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    AccountService(AccountRepository accountRepository, UserRepository userRepository) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
     }
 
-    Account add(Account account) {
+    public Account add(Account account) {
         Account saved = accountRepository.save(account);
 
         User user = account.getUser();
@@ -31,23 +31,19 @@ public class AccountService {
         return saved;
     }
 
-    Optional<Account> get(UUID accountId) {
+    public Optional<Account> get(UUID accountId) {
         return accountRepository.findById(accountId);
     }
 
-    void setBalance(UUID accountId, BigDecimal balance) {
+    public void setBalance(UUID accountId, BigDecimal balance) {
         accountRepository.setAccountBalanceById(accountId, balance);
     }
 
-    List<Account> getUserAccounts(Long userId) {
+    public List<Account> getUserAccounts(Long userId) {
         return accountRepository.findAllByUserId(userId);
     }
 
-    int countUserAccounts(Long userId) {
-        return accountRepository.countByUserId(userId);
-    }
-
-    Optional<Account> getUserPrimaryAccount(Long userId) {
+    public Optional<Account> getUserPrimaryAccount(Long userId) {
         Optional<User> optional = userRepository.findById(userId);
         return optional.map(User::getPrimaryAccount);
     }
