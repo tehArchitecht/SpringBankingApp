@@ -113,7 +113,7 @@ public class BankService {
     public Result<List<AccountDto>> getUserAccounts() {
         try {
             if (isTokenInvalid())
-                return Result.ofFailure(Status.BAD_TOKEN);
+                return Result.ofFailure(Status.FAILURE_BAD_TOKEN);
             User user = getUser();
             Long userId = user.getId();
 
@@ -133,7 +133,7 @@ public class BankService {
     public Result<List<OperationDto>> getUserOperations() {
         try {
             if (isTokenInvalid())
-                return Result.ofFailure(Status.BAD_TOKEN);
+                return Result.ofFailure(Status.FAILURE_BAD_TOKEN);
             Long userId = getUserId();
 
             List<Account> accounts = accountService.getUserAccounts(userId);
@@ -165,7 +165,7 @@ public class BankService {
 
         try {
             if (isTokenInvalid())
-                return Result.ofFailure(Status.BAD_TOKEN);
+                return Result.ofFailure(Status.FAILURE_BAD_TOKEN);
             User user = getUser();
 
             Account created = accountService.add(new Account(user, currency));
@@ -184,7 +184,7 @@ public class BankService {
 
         try {
             if (isTokenInvalid())
-                return Status.BAD_TOKEN;
+                return Status.FAILURE_BAD_TOKEN;
             Long userId = getUserId();
 
             userService.setPrimaryAccountId(userId, accountId);
@@ -236,10 +236,6 @@ public class BankService {
                 return Status.TRANSFER_FUNDS_FAILURE_INVALID_PHONE_NUMBER;
             User receiver = userOptional.get();
 
-            int count = accountService.countUserAccounts(receiver.getId());
-            if (count == 0)
-                return Status.TRANSFER_FUNDS_FAILURE_RECEIVER_HAS_NO_ACCOUNTS;
-
             Optional<Account> accountOptional = accountService.getUserPrimaryAccount(receiver.getId());
             if (!accountOptional.isPresent())
                 return Status.TRANSFER_FUNDS_FAILURE_RECEIVER_HAS_NO_PRIMARY_ACCOUNT;
@@ -250,6 +246,7 @@ public class BankService {
 
             BigDecimal senderInitialBalance = senderAccount.getBalance();
             BigDecimal receiverInitialBalance = receiverAccount.getBalance();
+
             Currency senderCurrency = senderAccount.getCurrency();
             Currency receiverCurrency = receiverAccount.getCurrency();
 
@@ -331,7 +328,7 @@ public class BankService {
     private Result<Account> getAccountEntity(UUID accountId) {
         try {
             if (isTokenInvalid())
-                return Result.ofFailure(Status.BAD_TOKEN);
+                return Result.ofFailure(Status.FAILURE_BAD_TOKEN);
             User user = getUser();
 
             Optional<Account> optional = accountService.get(accountId);
@@ -342,7 +339,7 @@ public class BankService {
             if (!account.getUser().equals(user))
                 return Result.ofFailure(Status.FAILURE_UNAUTHORIZED_ACCESS);
 
-            return Result.ofSuccess(Status.SUCCESS, account);
+            return Result.ofSuccess(null, account);
         } catch (DataAccessException e) {
             return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
         }

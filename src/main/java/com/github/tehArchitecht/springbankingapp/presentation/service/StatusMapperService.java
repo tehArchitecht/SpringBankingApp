@@ -19,7 +19,7 @@ public class StatusMapperService {
     private HttpStatus getHttpStatus(Status status) {
         switch (status) {
             // status values shared by methods
-            case BAD_TOKEN:
+            case FAILURE_BAD_TOKEN:
                 return HttpStatus.UNAUTHORIZED;
             case FAILURE_INTERNAL_ERROR:
                 return HttpStatus.INTERNAL_SERVER_ERROR;
@@ -62,17 +62,12 @@ public class StatusMapperService {
                 return HttpStatus.OK;
             case TRANSFER_FUNDS_FAILURE_INVALID_PHONE_NUMBER:
                 return HttpStatus.UNPROCESSABLE_ENTITY;
-            case TRANSFER_FUNDS_FAILURE_RECEIVER_HAS_NO_ACCOUNTS:
-                return HttpStatus.UNPROCESSABLE_ENTITY;
             case TRANSFER_FUNDS_FAILURE_RECEIVER_HAS_NO_PRIMARY_ACCOUNT:
                 return HttpStatus.UNPROCESSABLE_ENTITY;
             case TRANSFER_FUNDS_FAILURE_SAME_ACCOUNT:
                 return HttpStatus.UNPROCESSABLE_ENTITY;
             case TRANSFER_FUNDS_FAILURE_INSUFFICIENT_FUNDS:
                 return HttpStatus.UNPROCESSABLE_ENTITY;
-            // helper status values
-            case SUCCESS:
-                return null;
             // default
             default: throw new IllegalArgumentException(status.toString());
         }

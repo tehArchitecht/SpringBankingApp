@@ -37,7 +37,7 @@ public class BankController {
 
     @PostMapping("/signin-with-phone-number")
     @ApiOperation("sign in with phone number")
-    public ResponseEntity<?> signInWithName(@RequestBody SignInWithPhoneNumberRequest request) {
+    public ResponseEntity<?> signInWithPhoneNumber(@RequestBody SignInWithPhoneNumberRequest request) {
         return statusMapperService.generateResponse(bankService.signWithPhoneNumber(request));
     }
 
