@@ -2,7 +2,6 @@ package com.github.tehArchitecht.springbankingapp.presentation.controller;
 
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.*;
 import com.github.tehArchitecht.springbankingapp.presentation.service.StatusMapperService;
-import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenService;
 import com.github.tehArchitecht.springbankingapp.logic.service.BankService;
 
 import org.springframework.http.ResponseEntity;

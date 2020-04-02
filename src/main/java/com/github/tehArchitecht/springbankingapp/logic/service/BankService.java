@@ -37,19 +37,23 @@ public class BankService {
     private final OperationService operationService;
     private final UserService userService;
 
+    private final EntityMapperService entityMapperService;
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final PasswordEncoder passwordEncoder;
 
     public BankService(AccountService accountService, OperationService operationService,
                        UserService userService, AuthenticationManager authenticationManager,
-                       PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService) {
+                       PasswordEncoder passwordEncoder, JwtTokenService jwtTokenService,
+                       EntityMapperService entityMapperService) {
         this.accountService = accountService;
         this.operationService = operationService;
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenService = jwtTokenService;
+        this.entityMapperService = entityMapperService;
     }
 
     // -------------------------------------------------------------------------------------------------------------- //
@@ -64,7 +68,7 @@ public class BankService {
             if (userService.isNameInUse(userName) || userService.isPhoneNumberInUse(phoneNumber))
                 return Status.SING_UP_FAILURE_NAME_OR_PHONE_NUMBER_TAKEN;
 
-            User user = extractUser(request);
+            User user = entityMapperService.extractUser(request);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userService.add(user);
             return Status.SIGN_UP_SUCCESS;
@@ -118,7 +122,7 @@ public class BankService {
 
             List<Account> accounts = accountService.getUserAccounts(userId);
             List<AccountDto> accountDtos = accounts.stream()
-                    .map((Account account) -> convertAccount(account, primaryAccountId))
+                    .map((Account account) -> entityMapperService.convertAccount(account, primaryAccountId))
                     .collect(Collectors.toList());
             return Result.ofSuccess(Status.GET_USER_ACCOUNTS_SUCCESS, accountDtos);
         } catch (DataAccessException e) {
@@ -139,7 +143,7 @@ public class BankService {
                 List<Operation> operations = operationService.findAllByAccountId(accountId);
                 stream = Stream.concat(
                         stream,
-                        operations.stream().map(op -> convertOperation(op, accountId))
+                        operations.stream().map(op -> entityMapperService.convertOperation(op, accountId))
                 );
             }
 
@@ -168,7 +172,7 @@ public class BankService {
             UUID primaryAccountId = accountService.getUserPrimaryAccount(user.getId())
                     .map(Account::getId).orElse(null);
 
-            AccountDto account = convertAccount(created, primaryAccountId);
+            AccountDto account = entityMapperService.convertAccount(created, primaryAccountId);
             return Result.ofSuccess(Status.CREATE_ACCOUNT_SUCCESS, account);
         } catch (DataAccessException e) {
             return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
@@ -302,6 +306,12 @@ public class BankService {
     // Helper methods                                                                                                 //
     // -------------------------------------------------------------------------------------------------------------- //
 
+    private String generateToken(String userName, String password) {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
+        CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
+        return "Bearer " + jwtTokenService.generateToken(details);
+    }
+
     private boolean isTokenInvalid() {
         return !SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
     }
@@ -336,55 +346,5 @@ public class BankService {
         } catch (DataAccessException e) {
             return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
         }
-    }
-
-    private User extractUser(SignUpRequest request) {
-        return new User(
-                request.getUserName(),
-                request.getPassword(),
-                request.getAddress(),
-                request.getPhoneNumber()
-        );
-    }
-
-    private AccountDto convertAccount(Account account, UUID primaryAccountId) {
-        return new AccountDto(
-                account.getId(),
-                account.getBalance(),
-                account.getCurrency(),
-                account.getId().equals(primaryAccountId)
-        );
-    }
-
-    private OperationDto convertOperation(Operation operation, UUID accountId) {
-        UUID senderAccountId = operation.getSenderAccount().getId();
-        UUID receiverAccountId = operation.getReceiverAccount().getId();
-        if (accountId.equals(senderAccountId)) {
-            return new OperationDto(
-                    operation.getDate(),
-                    operation.getCurrency(),
-                    senderAccountId,
-                    receiverAccountId,
-                    operation.getAmount(),
-                    operation.getSenderInitialBalance(),
-                    operation.getSenderResultingBalance()
-            );
-        } else {
-            return new OperationDto(
-                    operation.getDate(),
-                    operation.getCurrency(),
-                    senderAccountId,
-                    receiverAccountId,
-                    operation.getAmount(),
-                    operation.getReceiverInitialBalance(),
-                    operation.getReceiverResultingBalance()
-            );
-        }
-    }
-
-    private String generateToken(String userName, String password) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-        CustomUserDetails details = (CustomUserDetails) authenticationManager.authenticate(token).getPrincipal();
-        return "Bearer " + jwtTokenService.generateToken(details);
     }
 }

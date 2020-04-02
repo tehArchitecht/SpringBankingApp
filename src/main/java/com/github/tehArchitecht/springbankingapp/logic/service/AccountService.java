@@ -49,8 +49,6 @@ public class AccountService {
 
     Optional<Account> getUserPrimaryAccount(Long userId) {
         Optional<User> optional = userRepository.findById(userId);
-        return optional.isPresent()
-                ? Optional.of(optional.get().getPrimaryAccount())
-                : Optional.empty();
+        return optional.map(User::getPrimaryAccount);
     }
 }

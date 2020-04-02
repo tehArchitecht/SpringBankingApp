@@ -4,13 +4,11 @@ import com.github.tehArchitecht.springbankingapp.security.exception.InvalidJwtTo
 import com.github.tehArchitecht.springbankingapp.security.service.CustomUserDetailsService;
 import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenService;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,8 +20,8 @@ import java.io.IOException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-    private CustomUserDetailsService userDetailsService;
-    private JwtTokenService jwtTokenService;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtTokenService jwtTokenService;
 
     JwtRequestFilter(CustomUserDetailsService userDetailsService, JwtTokenService jwtTokenService) {
         this.userDetailsService = userDetailsService;
