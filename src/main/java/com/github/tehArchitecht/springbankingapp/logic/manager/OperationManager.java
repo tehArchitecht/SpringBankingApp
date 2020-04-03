@@ -72,7 +72,7 @@ public class OperationManager extends SecuredValidatingManager {
     }
 
     public Status depositFunds(DepositFundsRequest request) {
-        if (request == null || hasContraintViolations(request))
+        if (request == null || hasConstraintViolations(request))
             return Status.FAILURE_VALIDATION_ERROR;
 
         UUID accountId = request.getAccountId();
@@ -96,7 +96,7 @@ public class OperationManager extends SecuredValidatingManager {
     }
 
     public Status transferFunds(TransferFundsRequest request) {
-        if (request == null || hasContraintViolations(request))
+        if (request == null || hasConstraintViolations(request))
             return Status.FAILURE_VALIDATION_ERROR;
 
         UUID senderAccountId = request.getSenderAccountId();

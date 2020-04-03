@@ -55,7 +55,7 @@ public class AccountManager extends SecuredValidatingManager {
         }
     }
     public Result<AccountDto> createAccount(CreateAccountRequest request) {
-        if (request == null || hasContraintViolations(request))
+        if (request == null || hasConstraintViolations(request))
             return Result.ofFailure(Status.FAILURE_VALIDATION_ERROR);
 
         Currency currency = request.getCurrency();
@@ -77,7 +77,7 @@ public class AccountManager extends SecuredValidatingManager {
     }
 
     public Status setPrimaryAccount(SetPrimaryAccountRequest request) {
-        if (request == null || hasContraintViolations(request))
+        if (request == null || hasConstraintViolations(request))
             return Status.FAILURE_VALIDATION_ERROR;
 
         UUID accountId = request.getAccountId();

@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public interface AccountRepository extends CrudRepository<Account, UUID> {
     List<Account> findAllByUserId(Long userId);
-    Integer countByUserId(Long userId);
 
     @Modifying
     @Transactional

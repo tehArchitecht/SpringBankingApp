@@ -34,7 +34,7 @@ public class UserManager extends SecuredValidatingManager {
     }
 
     public Status signUp (SignUpRequest request) {
-        if (request == null || hasContraintViolations(request))
+        if (request == null || hasConstraintViolations(request))
             return Status.FAILURE_VALIDATION_ERROR;
 
         String userName = request.getUserName();
@@ -54,7 +54,7 @@ public class UserManager extends SecuredValidatingManager {
     }
 
     public Result<String> signInWithName(SignInWithNameRequest request) {
-        if (request == null || hasContraintViolations(request))
+        if (request == null || hasConstraintViolations(request))
             return Result.ofFailure(Status.FAILURE_VALIDATION_ERROR);
 
         String userName = request.getUserName();
@@ -68,7 +68,7 @@ public class UserManager extends SecuredValidatingManager {
     }
 
     public Result<String> signWithPhoneNumber(SignInWithPhoneNumberRequest request) {
-        if (request == null || hasContraintViolations(request))
+        if (request == null || hasConstraintViolations(request))
             return Result.ofFailure(Status.FAILURE_VALIDATION_ERROR);
 
         String phoneNumber = request.getPhoneNumber();

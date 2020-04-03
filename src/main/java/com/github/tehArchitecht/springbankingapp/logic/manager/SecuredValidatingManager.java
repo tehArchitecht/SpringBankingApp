@@ -21,7 +21,7 @@ abstract class SecuredValidatingManager {
         this.validator = new LocalValidatorFactoryBean();
     }
 
-    protected <T> boolean hasContraintViolations(T object) {
+    protected <T> boolean hasConstraintViolations(T object) {
         return !validator.validate(object).isEmpty();
     }
 
