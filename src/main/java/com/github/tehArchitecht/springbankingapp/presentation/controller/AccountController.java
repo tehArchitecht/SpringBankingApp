@@ -3,6 +3,7 @@ package com.github.tehArchitecht.springbankingapp.presentation.controller;
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.CreateAccountRequest;
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.SetPrimaryAccountRequest;
 import com.github.tehArchitecht.springbankingapp.logic.manager.AccountManager;
+import com.github.tehArchitecht.springbankingapp.presentation.DefaultApiResponses;
 import com.github.tehArchitecht.springbankingapp.presentation.service.StatusMapperService;
 
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/accounts")
+@DefaultApiResponses
 public class AccountController {
     private final AccountManager accountManager;
     private final StatusMapperService statusMapperService;

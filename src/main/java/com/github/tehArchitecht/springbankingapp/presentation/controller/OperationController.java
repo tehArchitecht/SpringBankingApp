@@ -3,6 +3,7 @@ package com.github.tehArchitecht.springbankingapp.presentation.controller;
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.DepositFundsRequest;
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.TransferFundsRequest;
 import com.github.tehArchitecht.springbankingapp.logic.manager.OperationManager;
+import com.github.tehArchitecht.springbankingapp.presentation.DefaultApiResponses;
 import com.github.tehArchitecht.springbankingapp.presentation.service.StatusMapperService;
 
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/operations")
+@DefaultApiResponses
 public class OperationController {
     private final OperationManager operationManager;
     private final StatusMapperService statusMapperService;

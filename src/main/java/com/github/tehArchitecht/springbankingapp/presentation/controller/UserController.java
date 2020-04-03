@@ -4,6 +4,7 @@ import com.github.tehArchitecht.springbankingapp.logic.dto.request.SignInWithNam
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.SignInWithPhoneNumberRequest;
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.SignUpRequest;
 import com.github.tehArchitecht.springbankingapp.logic.manager.UserManager;
+import com.github.tehArchitecht.springbankingapp.presentation.DefaultApiResponses;
 import com.github.tehArchitecht.springbankingapp.presentation.service.StatusMapperService;
 
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@DefaultApiResponses
 public class UserController {
     private final UserManager userManager;
     private final StatusMapperService statusMapperService;
