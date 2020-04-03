@@ -8,7 +8,7 @@ import com.github.tehArchitecht.springbankingapp.logic.dto.request.SignInWithPho
 import com.github.tehArchitecht.springbankingapp.logic.dto.request.SignUpRequest;
 import com.github.tehArchitecht.springbankingapp.logic.service.EntityMapperService;
 import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenService;
-import com.github.tehArchitecht.springbankingapp.service.UserService;
+import com.github.tehArchitecht.springbankingapp.logic.service.UserService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

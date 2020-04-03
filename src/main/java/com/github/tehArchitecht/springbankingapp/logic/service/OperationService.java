@@ -1,4 +1,4 @@
-package com.github.tehArchitecht.springbankingapp.service;
+package com.github.tehArchitecht.springbankingapp.logic.service;
 
 import com.github.tehArchitecht.springbankingapp.data.model.Operation;
 import com.github.tehArchitecht.springbankingapp.data.repository.OperationRepository;
