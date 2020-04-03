@@ -6,14 +6,23 @@ import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenServic
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-abstract class SecuredManager {
+import javax.validation.Validator;
+
+abstract class SecuredValidatingManager {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
+    private final Validator validator;
 
-    protected SecuredManager(AuthenticationManager authenticationManager, JwtTokenService jwtTokenService) {
+    protected SecuredValidatingManager(AuthenticationManager authenticationManager, JwtTokenService jwtTokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenService = jwtTokenService;
+        this.validator = new LocalValidatorFactoryBean();
+    }
+
+    protected <T> boolean hasContraintViolations(T object) {
+        return !validator.validate(object).isEmpty();
     }
 
     protected String generateToken(String userName, String password) {

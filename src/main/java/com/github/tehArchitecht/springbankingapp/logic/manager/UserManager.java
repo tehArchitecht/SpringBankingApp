@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class UserManager extends SecuredManager {
+public class UserManager extends SecuredValidatingManager {
     private final EntityMapperService entityMapperService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
@@ -34,6 +34,9 @@ public class UserManager extends SecuredManager {
     }
 
     public Status signUp (SignUpRequest request) {
+        if (request == null || hasContraintViolations(request))
+            return Status.FAILURE_VALIDATION_ERROR;
+
         String userName = request.getUserName();
         String phoneNumber = request.getPhoneNumber();
 
@@ -51,6 +54,9 @@ public class UserManager extends SecuredManager {
     }
 
     public Result<String> signInWithName(SignInWithNameRequest request) {
+        if (request == null || hasContraintViolations(request))
+            return Result.ofFailure(Status.FAILURE_VALIDATION_ERROR);
+
         String userName = request.getUserName();
         String password = request.getPassword();
 
@@ -62,6 +68,9 @@ public class UserManager extends SecuredManager {
     }
 
     public Result<String> signWithPhoneNumber(SignInWithPhoneNumberRequest request) {
+        if (request == null || hasContraintViolations(request))
+            return Result.ofFailure(Status.FAILURE_VALIDATION_ERROR);
+
         String phoneNumber = request.getPhoneNumber();
         String password = request.getPassword();
 

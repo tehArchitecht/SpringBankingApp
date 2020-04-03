@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class OperationManager extends SecuredManager {
+public class OperationManager extends SecuredValidatingManager {
     private final EntityMapperService entityMapperService;
     private final AccountService accountService;
     private final OperationService operationService;
@@ -72,6 +72,9 @@ public class OperationManager extends SecuredManager {
     }
 
     public Status depositFunds(DepositFundsRequest request) {
+        if (request == null || hasContraintViolations(request))
+            return Status.FAILURE_VALIDATION_ERROR;
+
         UUID accountId = request.getAccountId();
         BigDecimal amount = request.getAmount();
         Currency currency = request.getCurrency();
@@ -93,6 +96,9 @@ public class OperationManager extends SecuredManager {
     }
 
     public Status transferFunds(TransferFundsRequest request) {
+        if (request == null || hasContraintViolations(request))
+            return Status.FAILURE_VALIDATION_ERROR;
+
         UUID senderAccountId = request.getSenderAccountId();
         String receiverPhoneNumber = request.getReceiverPhoneNumber();
         BigDecimal amount = request.getAmount();

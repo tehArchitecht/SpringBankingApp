@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class AccountManager extends SecuredManager {
+public class AccountManager extends SecuredValidatingManager {
     private final EntityMapperService entityMapperService;
     private final AccountService accountService;
     private final UserService userService;
@@ -55,6 +55,9 @@ public class AccountManager extends SecuredManager {
         }
     }
     public Result<AccountDto> createAccount(CreateAccountRequest request) {
+        if (request == null || hasContraintViolations(request))
+            return Result.ofFailure(Status.FAILURE_VALIDATION_ERROR);
+
         Currency currency = request.getCurrency();
 
         try {
@@ -74,6 +77,9 @@ public class AccountManager extends SecuredManager {
     }
 
     public Status setPrimaryAccount(SetPrimaryAccountRequest request) {
+        if (request == null || hasContraintViolations(request))
+            return Status.FAILURE_VALIDATION_ERROR;
+
         UUID accountId = request.getAccountId();
 
         try {

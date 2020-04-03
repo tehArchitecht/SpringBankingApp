@@ -27,6 +27,8 @@ public class StatusMapperService {
                 return HttpStatus.UNPROCESSABLE_ENTITY;
             case FAILURE_UNAUTHORIZED_ACCESS:
                 return HttpStatus.FORBIDDEN;
+            case FAILURE_VALIDATION_ERROR:
+                return HttpStatus.UNPROCESSABLE_ENTITY;
             // signUp
             case SIGN_UP_SUCCESS:
                 return HttpStatus.CREATED;
