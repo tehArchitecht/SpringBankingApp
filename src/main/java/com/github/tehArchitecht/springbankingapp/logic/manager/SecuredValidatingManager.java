@@ -3,14 +3,22 @@ package com.github.tehArchitecht.springbankingapp.logic.manager;
 import com.github.tehArchitecht.springbankingapp.data.model.User;
 import com.github.tehArchitecht.springbankingapp.security.CustomUserDetails;
 import com.github.tehArchitecht.springbankingapp.security.service.JwtTokenService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
 import javax.validation.Validator;
+import java.util.Set;
 
 abstract class SecuredValidatingManager {
+    private final static Logger logger = LoggerFactory.getLogger(SecuredValidatingManager.class);
+
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final Validator validator;
@@ -18,11 +26,14 @@ abstract class SecuredValidatingManager {
     protected SecuredValidatingManager(AuthenticationManager authenticationManager, JwtTokenService jwtTokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenService = jwtTokenService;
-        this.validator = new LocalValidatorFactoryBean();
+        this.validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     protected <T> boolean hasConstraintViolations(T object) {
-        return !validator.validate(object).isEmpty();
+        Set<ConstraintViolation<T>> violations = validator.validate(object);
+        for (ConstraintViolation<T> violation : violations)
+            logger.warn(violation.getPropertyPath() + " " + violation.getMessage());
+        return !violations.isEmpty();
     }
 
     protected String generateToken(String userName, String password) {
