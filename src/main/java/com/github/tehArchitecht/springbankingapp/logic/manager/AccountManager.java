@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -87,10 +88,30 @@ public class AccountManager extends SecuredValidatingManager {
                 return Status.FAILURE_BAD_TOKEN;
             Long userId = getUserId();
 
+            Result<Boolean> result = canAccessAccount(userId, accountId);
+            if (result.failure())
+                return result.getStatus();
+
             userService.setPrimaryAccountId(userId, accountId);
             return Status.SET_PRIMARY_ACCOUNT_SUCCESS;
         } catch (DataAccessException e) {
             return Status.FAILURE_INTERNAL_ERROR;
+        }
+    }
+
+    private Result<Boolean> canAccessAccount(Long userId, UUID accountId) {
+        try {
+             Optional<Account> optional = accountService.get(accountId);
+            if (!optional.isPresent())
+                return Result.ofFailure(Status.FAILURE_INVALID_ACCOUNT_ID);
+
+            Account account = optional.get();
+            if (!account.getUser().getId().equals(userId))
+                return Result.ofFailure(Status.FAILURE_UNAUTHORIZED_ACCESS);
+
+            return Result.ofSuccess(null, true);
+        } catch (DataAccessException e) {
+            return Result.ofFailure(Status.FAILURE_INTERNAL_ERROR);
         }
     }
 }
